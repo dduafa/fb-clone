@@ -1,24 +1,46 @@
-import React from 'react';
-import StoryReel from '../storyReel/StoryReel';
-import './Feed.css';
+import React, { useState, useEffect } from "react";
+import StoryReel from "../storyReel/StoryReel";
+import "./Feed.css";
 
-import Post from '../post/Post';
-import MessageSender from '../messageSender/MessageSender';
+import Post from "../post/Post";
+import MessageSender from "../messageSender/MessageSender";
+
+import { orderBy, collection, getDocs, query } from "firebase/firestore";
+import db from "../../config/firebase";
+
 const Feed = () => {
-    return (
-        <div className="feed">
-            <StoryReel />
-            <MessageSender />
+  const [posts, setPosts] = useState([]);
 
-            <Post 
-                profilePic='https://i.picsum.photos/id/1011/5472/3648.jpg?hmac=Koo9845x2akkVzVFX3xxAc9BCkeGYA9VRVfLE4f0Zzk'
-                message='Some message'
-                image='https://i.picsum.photos/id/101/200/300.jpg?hmac=xUDvORQTxaML0fp9wnx4y6LIHvc7M-tNcOJz8rDLRXo'
-                username='David' 
-                timestamp='timesapm'
-            />
-        </div>
-    )
-}
+  useEffect(() => {
+    const fromFirestore = async () => {
+      const postsRef = collection(db, "posts");
+      const orderedPostsQuery = query(postsRef, orderBy("timestamp", "desc"));
+      const querySnapshot = await getDocs(orderedPostsQuery);
 
-export default Feed
+      setPosts(
+        querySnapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() }))
+      );
+    };
+    fromFirestore();
+  }, [posts]);
+
+  return (
+    <div className="feed">
+      <StoryReel />
+      <MessageSender />
+      {posts &&
+        posts.map((post) => (
+          <Post
+            key={post.id}
+            profilePic={post.data.profilePic}
+            message={post.data.message}
+            image={post.data.image}
+            username={post.data.username}
+            timestamp={post.data.timestamp}
+          />
+        ))}
+    </div>
+  );
+};
+
+export default Feed;

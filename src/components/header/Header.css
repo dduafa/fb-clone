@@ -2,7 +2,6 @@
     display: flex;
     padding: 20px 20px;
     justify-content: space-between;
-
     position: sticky;
     background-color: white;
     z-index: 100;

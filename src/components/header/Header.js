@@ -12,8 +12,11 @@ import {
   Forum as ForumIcon,
 } from "@mui/icons-material";
 import { Avatar, IconButton } from "@mui/material";
+import { useStateValue } from "../StateProvider";
 
 const Header = () => {
+  const [{ user }, dispatch] = useStateValue();
+
   return (
     <div className="header">
       <div className="header__left">
@@ -41,8 +44,8 @@ const Header = () => {
 
       <div className="header__right">
         <div className="header__info">
-          <Avatar />
-          <h4>Derek Dev</h4>
+          <Avatar src={user.photoURL}/>
+          <h4>{user.displayName}</h4>
         </div>
         <IconButton>
           <AddIcon />
